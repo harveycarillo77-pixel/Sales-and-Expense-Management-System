@@ -34,18 +34,18 @@ public class AuditLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long logId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "user_id", nullable = true)
     private User user;
 
     @NotBlank
     @Column(nullable = false, length = 255)
     private String action;
 
-    @Column(name = "table_name", nullable = false, length = 100)
+    @Column(name = "table_name", nullable = true, length = 100)
     private String tableName;
 
-    @Column(name = "record_id", nullable = false)
+    @Column(name = "record_id", nullable = true)
     private Long recordId;
 
     @Column(name = "module_name", length = 100)

@@ -17,7 +17,7 @@ public class JwtServiceImpl implements JwtService {
 
     private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
-    private final long expiration = 1000 * 60 * 5; // 1hr
+    private final long expiration = 1000 * 60 * 240; // 4 hours
 
     @Override
     public String generateToken(User user) {
