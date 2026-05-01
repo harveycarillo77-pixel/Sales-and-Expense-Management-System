@@ -36,8 +36,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class ExpenseServiceImpl implements ExpenseService {
+
+    private static final Logger log = LoggerFactory.getLogger(ExpenseServiceImpl.class);
 
     private final ExpenseRepository expenseRepository;
     private final UserRepository userRepository;
@@ -178,7 +183,27 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     @Transactional
     public Expense updateExpense(Long id, ExpenseUpdateRequest request, HttpServletRequest httpRequest) {
-        Expense existing = getExpenseById(id);
+        Expense existing = expenseRepository.findById(id)
+                .orElseThrow(() -> new ApiException("Expense not found", HttpStatus.NOT_FOUND));
+        initializeExpenseRelations(existing);
+
+        // 🚨 STEP 2A — BLOCK if already VOIDED
+        if (Boolean.TRUE.equals(existing.getIsVoided())) {
+            throw new ApiException("Voided sales cannot be edited", HttpStatus.CONFLICT);
+        }
+
+        // 🚨 STEP 2B — OPTIMISTIC LOCK CHECK (DEBUG)
+        log.warn(">>> VERSION CHECK: DB version={} (type={}), Request version={} (type={})",
+            existing.getVersion(),
+            existing.getVersion() == null ? "null" : existing.getVersion().getClass().getSimpleName(),
+            request.getVersion(),
+            request.getVersion() == null ? "null" : request.getVersion().getClass().getSimpleName()
+        );
+        if (request.getVersion() == null || !existing.getVersion().equals(request.getVersion())) {
+            log.warn(">>> VERSION MISMATCH — throwing 409. DB={}, Request={}", existing.getVersion(), request.getVersion());
+            throw new ApiException("Data has been modified by another user", HttpStatus.CONFLICT);
+        }
+        log.warn(">>> VERSION OK — proceeding with update");
 
         validatePeriodNotLocked(existing.getPeriod());
 
@@ -290,13 +315,23 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     @Transactional
-    public Expense voidExpense(Long id, String reason, HttpServletRequest httpRequest) {
-        Expense expense = getExpenseById(id);
+    public Expense voidExpense(Long id, String reason, Long version, HttpServletRequest httpRequest) {
+        Expense expense = expenseRepository.findById(id)
+                .orElseThrow(() -> new ApiException("Expense not found", HttpStatus.NOT_FOUND));
+        initializeExpenseRelations(expense);
 
         validatePeriodNotLocked(expense.getPeriod());
 
         if (Boolean.TRUE.equals(expense.getIsVoided())) {
             throw new ApiException("Expense is already voided", HttpStatus.CONFLICT);
+        }
+
+        // Optimistic lock check: reject if the client's version doesn't match the DB.
+        // This catches the case where another user edited the expense after this user
+        // loaded it — expense.getVersion() is never null for a persisted entity, so
+        // the old "== null" guard was a no-op that protected nothing.
+        if (version == null || expense.getVersion() == null || !expense.getVersion().equals(version)) {
+            throw new ApiException("Data has been modified by another user", HttpStatus.CONFLICT);
         }
 
         User currentUser = getCurrentUser();

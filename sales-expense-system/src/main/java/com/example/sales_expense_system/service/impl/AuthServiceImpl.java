@@ -229,6 +229,8 @@ public class AuthServiceImpl implements AuthService {
         );
 
         String token = jwtService.generateToken(user);
+            user.setActiveToken(token);
+            userRepository.save(user);
 
         return new JwtResponse(
                 token,
@@ -245,6 +247,9 @@ public class AuthServiceImpl implements AuthService {
     public void logout(String username, HttpServletRequest httpRequest) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+                user.setActiveToken(null);
+                userRepository.save(user);
 
         auditLogService.log(
                 AuditActions.LOGOUT,

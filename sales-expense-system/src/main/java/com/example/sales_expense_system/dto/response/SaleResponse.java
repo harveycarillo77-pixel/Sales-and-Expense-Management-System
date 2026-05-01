@@ -23,6 +23,7 @@ public class SaleResponse {
     private String voidedByUsername;
     private Long createdByUserId;
     private String createdByUsername;
+    private Long version;
 
     public SaleResponse() {}
 
@@ -161,5 +162,13 @@ public class SaleResponse {
 
     public void setCreatedByUsername(String createdByUsername) {
         this.createdByUsername = createdByUsername;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

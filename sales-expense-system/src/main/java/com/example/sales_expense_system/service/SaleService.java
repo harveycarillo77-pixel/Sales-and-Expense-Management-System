@@ -25,7 +25,8 @@ public interface SaleService {
 
     Sale updateSale(Long id, SaleUpdateRequest request, HttpServletRequest requestHttp);
 
-    Sale voidSale(Long id, String reason, HttpServletRequest requestHttp);
+    // version added — required for optimistic lock check on void
+    Sale voidSale(Long id, String reason, Long version, HttpServletRequest requestHttp);
 
     void permanentDeleteSale(Long id, HttpServletRequest requestHttp);
 

@@ -103,4 +103,7 @@ public class Sale {
             totalAmount = quantity.multiply(unitPrice);
         }
     }
+                                                                                                                                                                                        
+    @Version
+    private Long version;
 }

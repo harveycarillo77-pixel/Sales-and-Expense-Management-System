@@ -7,7 +7,7 @@ import jakarta.validation.constraints.DecimalMin;
 
 public class SaleUpdateRequest {
 
-    private Integer categoryId;
+    private Long categoryId;
 
     private String orNumber;
 
@@ -23,14 +23,16 @@ public class SaleUpdateRequest {
 
     private LocalDate transactionDate;
 
+    private Long version;
+
     public SaleUpdateRequest() {
     }
 
-    public Integer getCategoryId() {
+    public Long getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(Integer categoryId) {
+    public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
     }
 
@@ -80,5 +82,13 @@ public class SaleUpdateRequest {
 
     public void setTransactionDate(LocalDate transactionDate) {
         this.transactionDate = transactionDate;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+    
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

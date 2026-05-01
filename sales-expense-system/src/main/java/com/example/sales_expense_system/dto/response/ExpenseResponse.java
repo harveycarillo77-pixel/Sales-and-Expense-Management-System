@@ -21,6 +21,7 @@ public class ExpenseResponse {
     private String voidedByUsername;
     private Long createdByUserId;
     private String createdByUsername;
+    private Long version;
 
     public ExpenseResponse() {
     }
@@ -143,5 +144,13 @@ public class ExpenseResponse {
 
     public void setCreatedByUsername(String createdByUsername) {
         this.createdByUsername = createdByUsername;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

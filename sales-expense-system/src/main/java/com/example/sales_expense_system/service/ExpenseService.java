@@ -25,7 +25,7 @@ public interface ExpenseService {
 
     Expense updateExpense(Long id, ExpenseUpdateRequest request, HttpServletRequest httpRequest);
 
-    Expense voidExpense(Long id, String reason, HttpServletRequest httpRequest);
+    Expense voidExpense(Long id, String reason, Long version, HttpServletRequest httpRequest);
 
     List<Expense> searchExpenses(String keyword);
 

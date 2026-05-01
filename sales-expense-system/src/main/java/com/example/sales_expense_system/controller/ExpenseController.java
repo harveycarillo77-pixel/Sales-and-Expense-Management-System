@@ -120,8 +120,10 @@ public class ExpenseController {
     @PostMapping("/{id}/void")
     @PreAuthorize("hasAnyRole('ADMIN','ACCOUNTANT')")
     public ResponseEntity<ExpenseResponse> voidExpense(@PathVariable Long id,
-                                                       @RequestParam String reason, HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(mapToDto(expenseService.voidExpense(id, reason, httpRequest)));
+                                                       @RequestParam String reason,
+                                                       @RequestParam Long version,
+                                                       HttpServletRequest httpRequest) {
+        return ResponseEntity.ok(mapToDto(expenseService.voidExpense(id, reason, version, httpRequest)));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -162,6 +164,7 @@ public class ExpenseController {
         dto.setVoidedByUsername(expense.getVoidedBy() != null ? expense.getVoidedBy().getUsername() : null);
         dto.setCreatedByUserId(expense.getCreatedBy() != null ? expense.getCreatedBy().getUserId() : null);
         dto.setCreatedByUsername(expense.getCreatedBy() != null ? expense.getCreatedBy().getUsername() : null);
+        dto.setVersion(expense.getVersion());
         return dto;
     }
 

@@ -7,7 +7,7 @@ import jakarta.validation.constraints.DecimalMin;
 
 public class ExpenseUpdateRequest {
 
-    private Integer categoryId;
+    private Long categoryId;
     private String expenseNumber;
     private String description;
     private String payeeName;
@@ -15,16 +15,18 @@ public class ExpenseUpdateRequest {
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
     private BigDecimal amount;
 
+    private Long version; // for optimistic locking on void
+
     private LocalDate expenseDate;
 
     public ExpenseUpdateRequest() {
     }
 
-    public Integer getCategoryId() {
+    public Long getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(Integer categoryId) {
+    public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
     }
 
@@ -67,5 +69,13 @@ public class ExpenseUpdateRequest {
 
     public void setExpenseDate(LocalDate expenseDate) {
         this.expenseDate = expenseDate;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

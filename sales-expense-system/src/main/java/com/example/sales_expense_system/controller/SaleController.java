@@ -120,8 +120,9 @@ public class SaleController {
     @PostMapping("/{id}/void")
     @PreAuthorize("hasAnyRole('ADMIN','ACCOUNTANT')")
     public ResponseEntity<SaleResponse> voidSale(@PathVariable Long id,
-                                                 @RequestParam String reason, HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(mapToDto(saleService.voidSale(id, reason, httpRequest)));
+                                                 @RequestParam String reason, 
+                                                 @RequestParam Long version, HttpServletRequest httpRequest) {
+        return ResponseEntity.ok(mapToDto(saleService.voidSale(id, reason, version, httpRequest)));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -164,6 +165,7 @@ public class SaleController {
             response.setVoidedByUsername(sale.getVoidedBy() != null ? sale.getVoidedBy().getUsername() : null);
             response.setCreatedByUserId(sale.getCreatedBy() != null ? sale.getCreatedBy().getUserId() : null);
             response.setCreatedByUsername(sale.getCreatedBy() != null ? sale.getCreatedBy().getUsername() : null);
+            response.setVersion(sale.getVersion());
             return response;
         }
 

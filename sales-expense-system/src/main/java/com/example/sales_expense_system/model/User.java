@@ -58,6 +58,9 @@ public class User {
     @Column(name = "is_2fa_enabled", nullable = false)
     private Boolean twoFactorEnabled = false;
 
+    @Column(name = "active_token", nullable = true)
+    private String activeToken;
+
     public enum UserStatus {
         ACTIVE,
         INACTIVE

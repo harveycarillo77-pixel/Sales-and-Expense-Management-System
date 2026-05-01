@@ -184,6 +184,16 @@ public class SaleServiceImpl implements SaleService {
 
         Sale existing = getSaleById(id);
 
+        // 🚨 STEP 2A — BLOCK if already VOIDED
+        if (Boolean.TRUE.equals(existing.getIsVoided())) {
+            throw new ApiException("Voided sales cannot be edited", HttpStatus.CONFLICT);
+        }
+
+        // 🚨 STEP 2B — OPTIMISTIC LOCK CHECK
+        if (request.getVersion() == null || !existing.getVersion().equals(request.getVersion())) {
+            throw new ApiException("Data has been modified by another user", HttpStatus.CONFLICT);
+        }
+
         validatePeriodNotLocked(existing.getPeriod());
 
         User currentUser = getCurrentUser();
@@ -303,15 +313,25 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     @Transactional
-    public Sale voidSale(Long id, String reason, HttpServletRequest httpRequest) {
+    public Sale voidSale(Long id, String reason, Long version, HttpServletRequest httpRequest) {
 
         Sale sale = getSaleById(id);
 
-        validatePeriodNotLocked(sale.getPeriod());
-
+        // Check for voided first — gives a clearer error than "stale data" when
+        // the record was already voided by someone else between load and submit.
         if (Boolean.TRUE.equals(sale.getIsVoided())) {
             throw new ApiException("Sale is already voided", HttpStatus.CONFLICT);
         }
+
+        // Optimistic lock check: reject if the client's version doesn't match the DB.
+        // This catches the case where another user edited the sale after this user
+        // loaded it — sale.getVersion() is never null for a persisted entity, so
+        // the old "== null" guard was a no-op that protected nothing.
+        if (version == null || !sale.getVersion().equals(version)) {
+            throw new ApiException("Data has been modified by another user", HttpStatus.CONFLICT);
+        }
+
+        validatePeriodNotLocked(sale.getPeriod());
 
         User currentUser = getCurrentUser();
         validateCanModifySale(sale, currentUser);
