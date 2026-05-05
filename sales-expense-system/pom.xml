@@ -14,12 +14,13 @@
 
     <groupId>com.example</groupId>
     <artifactId>sales-expense-system</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.${maven.build.timestamp}</version>
     <name>sales-expense-system</name>
 
     <properties>
         <java.version>21</java.version>
         <lombok.version>1.18.32</lombok.version>
+        <maven.build.timestamp.format>yyyyMMdd-HHmmss</maven.build.timestamp.format>
     </properties>
 
     <dependencies>
@@ -130,6 +131,12 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <!-- Compiler plugin -->
             <plugin>

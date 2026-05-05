@@ -49,7 +49,7 @@ public class SecurityConfig {
             .authenticationProvider(authenticationProvider())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/login", "/api/auth/verify-otp", "/api/auth/session-expired").permitAll()
+                .requestMatchers("/api/auth/login", "/api/auth/verify-otp", "/api/auth/session-expired", "/api/actuator/health", "/api/system/version").permitAll()
                 .requestMatchers("/api/auth/logout").authenticated()  // only admin can register
                 .requestMatchers("/api/sales/**", "/api/expenses/**").hasAnyRole("ADMIN","ACCOUNTANT")
                 .anyRequest().authenticated()
